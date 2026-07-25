@@ -3,347 +3,403 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Web-based microphone studio — capture live audio, apply voice effects, karaoke mode, and route to any output." />
+  <meta name="description" content="Web-based microphone studio — live audio, voice effects, karaoke, and Bluetooth output routing." />
   <title>Mic Live — Browser Microphone Studio</title>
-
-  <!-- Google Font: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <main class="app-container">
+<main class="app-container">
 
-    <!-- ===== Header ===== -->
-    <header class="app-header">
-      <div class="header-row">
-        <div class="logo">
-          <span class="logo-icon">🎙️</span>
-          <h1>Mic <span class="accent">Live</span></h1>
-        </div>
-        <div class="header-actions">
-          <button id="theme-btn" class="icon-btn" type="button" title="Toggle theme (T)">
-            <span id="theme-icon">🌙</span>
-          </button>
-          <button id="help-btn" class="icon-btn" type="button" title="Keyboard shortcuts">⌨️</button>
-        </div>
+  <!-- ===== Header (spans full grid width) ===== -->
+  <header class="app-header">
+    <div class="header-row">
+      <div class="logo">
+        <span class="logo-icon">🎙️</span>
+        <h1>Mic <span class="accent">Live</span></h1>
       </div>
-      <p class="tagline">Real-time audio capture, effects, voice changer &amp; karaoke</p>
-    </header>
-
-    <!-- ===== Browser Warning ===== -->
-    <div id="browser-warning" class="alert alert--error" hidden>
-      <strong>Unsupported Browser</strong>
-      <p id="browser-warning-text"></p>
-    </div>
-
-    <!-- ===== Shortcuts Modal ===== -->
-    <div id="shortcuts-modal" class="modal-overlay">
-      <div class="modal">
-        <div class="modal-header">
-          <h2>⌨️ Keyboard Shortcuts</h2>
-          <button id="modal-close" class="icon-btn" type="button">✕</button>
-        </div>
-        <div class="shortcuts-grid">
-          <kbd>Space</kbd><span>Start / Stop Microphone</span>
-          <kbd>R</kbd><span>Start / Stop Recording</span>
-          <kbd>T</kbd><span>Toggle Dark / Light Theme</span>
-          <kbd>V</kbd><span>Switch Visualizer Mode</span>
-          <kbd>M</kbd><span>Mute / Unmute</span>
-          <kbd>↑ / ↓</kbd><span>Volume Up / Down</span>
-          <kbd>Esc</kbd><span>Close this dialog</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== Status & Stats ===== -->
-    <div class="status-row">
-      <span id="status-badge" class="status-badge status--idle">Idle</span>
-      <div class="stats" id="stats-panel" hidden>
-        <span class="stat">🎵 <span id="stat-sr">—</span></span>
-        <span class="stat">⏱️ <span id="stat-latency">—</span></span>
-        <span class="stat">⏳ <span id="stat-duration">0:00</span></span>
-      </div>
-    </div>
-
-    <!-- ===== Audio Visualizer ===== -->
-    <div class="visualizer-container">
-      <canvas id="visualizer" class="visualizer-canvas"></canvas>
-      <div class="visualizer-controls">
-        <button id="viz-mode-btn" class="chip" type="button" title="Switch visualizer (V)">
-          <span id="viz-mode-text">Waveform</span>
+      <div class="header-actions">
+        <button id="theme-btn"  class="icon-btn" type="button" title="Toggle theme (T)">
+          <span id="theme-icon">🌙</span>
         </button>
-        <div class="viz-color-dots">
-          <button class="color-dot color-dot--purple active" data-color="purple"></button>
-          <button class="color-dot color-dot--cyan" data-color="cyan"></button>
-          <button class="color-dot color-dot--green" data-color="green"></button>
-          <button class="color-dot color-dot--fire" data-color="fire"></button>
-        </div>
+        <button id="help-btn"   class="icon-btn" type="button" title="Keyboard shortcuts">⌨️</button>
+        <button id="fs-btn"     class="icon-btn" type="button" title="Fullscreen (F)">⛶</button>
       </div>
     </div>
+    <p class="tagline">Real-time audio capture, effects, voice changer &amp; karaoke</p>
+  </header>
 
-    <!-- ===== Pitch Detection ===== -->
-    <div id="pitch-display" class="pitch-display" hidden>
-      <span class="pitch-note" id="pitch-note">—</span>
-      <span class="pitch-freq" id="pitch-freq">— Hz</span>
-      <div class="pitch-cents-bar">
-        <div class="pitch-cents-indicator" id="pitch-cents"></div>
+  <!-- ===== Browser Warning ===== -->
+  <div id="browser-warning" class="alert alert--error full-width" hidden>
+    <strong>Unsupported Browser</strong>
+    <p id="browser-warning-text"></p>
+  </div>
+
+  <!-- ===== Keyboard Shortcuts Modal ===== -->
+  <div id="shortcuts-modal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>⌨️ Keyboard Shortcuts</h2>
+        <button id="modal-close" class="icon-btn" type="button">✕</button>
+      </div>
+      <div class="shortcuts-grid">
+        <kbd>Space</kbd><span>Start / Stop Microphone</span>
+        <kbd>R</kbd>    <span>Start / Stop Recording</span>
+        <kbd>T</kbd>    <span>Toggle Dark / Light Theme</span>
+        <kbd>V</kbd>    <span>Switch Visualizer Mode</span>
+        <kbd>M</kbd>    <span>Mute / Unmute</span>
+        <kbd>F</kbd>    <span>Toggle Fullscreen Visualizer</span>
+        <kbd>↑ / ↓</kbd><span>Volume Up / Down</span>
+        <kbd>Esc</kbd>  <span>Close this dialog</span>
       </div>
     </div>
+  </div>
 
-    <!-- ===== Level Meter ===== -->
-    <div class="meter-container">
-      <div class="meter-track">
-        <div id="level-bar-l" class="meter-fill"></div>
-      </div>
-      <span id="level-db" class="meter-label">–∞ dB</span>
-    </div>
+  <!-- ===== Two-column layout grid ===== -->
+  <div class="layout-grid">
 
-    <!-- ===== Primary Mic Button ===== -->
-    <button id="mic-btn" class="btn btn--primary" type="button">
-      <span class="btn-icon" id="mic-btn-icon">🎤</span>
-      <span id="mic-btn-text">Start Microphone</span>
-      <kbd class="btn-shortcut">Space</kbd>
-    </button>
+    <!-- ══════════════════════════════════════
+         LEFT COLUMN — controls
+         ══════════════════════════════════════ -->
+    <div class="col col--left">
 
-    <!-- ===== Input Device ===== -->
-    <div id="input-device-section" class="control-group">
-      <label for="input-select" class="control-label">Input Device (Microphone)</label>
-      <select id="input-select" class="select">
-        <option value="">Default Microphone</option>
-      </select>
-    </div>
-
-    <!-- ===== Volume + Mute ===== -->
-    <div class="control-group">
-      <label for="gain-slider" class="control-label">
-        Volume <span id="gain-value" class="control-value">100 %</span>
-      </label>
-      <div class="slider-row">
-        <button id="mute-btn" class="icon-btn" type="button" title="Mute (M)">🔊</button>
-        <input id="gain-slider" type="range" min="0" max="200" value="100" step="1" class="slider" />
-      </div>
-    </div>
-
-    <!-- ===== 3-Band Equalizer ===== -->
-    <details class="panel">
-      <summary class="panel-toggle">🎛️ Equalizer</summary>
-      <div class="eq-bands">
-        <div class="eq-band">
-          <label for="eq-low">Low</label>
-          <input id="eq-low" type="range" min="-12" max="12" value="0" step="1" class="slider slider--eq" />
-          <span id="eq-low-val" class="eq-val">0 dB</span>
-        </div>
-        <div class="eq-band">
-          <label for="eq-mid">Mid</label>
-          <input id="eq-mid" type="range" min="-12" max="12" value="0" step="1" class="slider slider--eq" />
-          <span id="eq-mid-val" class="eq-val">0 dB</span>
-        </div>
-        <div class="eq-band">
-          <label for="eq-high">High</label>
-          <input id="eq-high" type="range" min="-12" max="12" value="0" step="1" class="slider slider--eq" />
-          <span id="eq-high-val" class="eq-val">0 dB</span>
-        </div>
-        <button id="eq-reset" class="chip chip--small" type="button">Reset EQ</button>
-      </div>
-    </details>
-
-    <!-- ===== Voice Effects ===== -->
-    <details class="panel">
-      <summary class="panel-toggle">✨ Voice Effects</summary>
-      <div class="fx-grid">
-        <!-- Reverb -->
-        <div class="fx-card">
-          <div class="fx-header">
-            <span class="fx-name">🏛️ Reverb</span>
-            <label class="toggle-switch">
-              <input type="checkbox" id="fx-reverb-toggle" />
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <div class="fx-controls">
-            <label for="fx-reverb-mix" class="fx-label">Mix <span id="fx-reverb-mix-val">30%</span></label>
-            <input id="fx-reverb-mix" type="range" min="0" max="100" value="30" class="slider slider--eq" />
-            <label for="fx-reverb-decay" class="fx-label">Decay <span id="fx-reverb-decay-val">2.0s</span></label>
-            <input id="fx-reverb-decay" type="range" min="0.1" max="5" value="2" step="0.1" class="slider slider--eq" />
-          </div>
-        </div>
-        <!-- Delay -->
-        <div class="fx-card">
-          <div class="fx-header">
-            <span class="fx-name">🔁 Delay</span>
-            <label class="toggle-switch">
-              <input type="checkbox" id="fx-delay-toggle" />
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <div class="fx-controls">
-            <label for="fx-delay-time" class="fx-label">Time <span id="fx-delay-time-val">300ms</span></label>
-            <input id="fx-delay-time" type="range" min="50" max="1000" value="300" step="10" class="slider slider--eq" />
-            <label for="fx-delay-feedback" class="fx-label">Feedback <span id="fx-delay-feedback-val">40%</span></label>
-            <input id="fx-delay-feedback" type="range" min="0" max="90" value="40" class="slider slider--eq" />
-          </div>
-        </div>
-        <!-- Distortion -->
-        <div class="fx-card">
-          <div class="fx-header">
-            <span class="fx-name">🔥 Distortion</span>
-            <label class="toggle-switch">
-              <input type="checkbox" id="fx-distort-toggle" />
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <div class="fx-controls">
-            <label for="fx-distort-amount" class="fx-label">Amount <span id="fx-distort-amount-val">50</span></label>
-            <input id="fx-distort-amount" type="range" min="0" max="100" value="50" class="slider slider--eq" />
-          </div>
+      <!-- Status & Stats -->
+      <div class="status-row">
+        <span id="status-badge" class="status-badge status--idle">Idle</span>
+        <div class="stats" id="stats-panel" hidden>
+          <span class="stat">🎵 <span id="stat-sr">—</span></span>
+          <span class="stat">⏱️ <span id="stat-latency">—</span></span>
+          <span class="stat">⏳ <span id="stat-duration">0:00</span></span>
         </div>
       </div>
-    </details>
 
-    <!-- ===== Voice Changer ===== -->
-    <details class="panel">
-      <summary class="panel-toggle">🎭 Voice Changer</summary>
-      <div class="voice-changer-content">
-        <p class="panel-hint">Select a voice preset to transform your microphone audio in real-time.</p>
-        <div class="voice-presets" id="voice-presets">
-          <button class="voice-preset active" data-voice="normal">
-            <span class="vp-icon">🗣️</span><span class="vp-label">Normal</span>
-          </button>
-          <button class="voice-preset" data-voice="deep">
-            <span class="vp-icon">👹</span><span class="vp-label">Deep</span>
-          </button>
-          <button class="voice-preset" data-voice="chipmunk">
-            <span class="vp-icon">🐿️</span><span class="vp-label">Chipmunk</span>
-          </button>
-          <button class="voice-preset" data-voice="robot">
-            <span class="vp-icon">🤖</span><span class="vp-label">Robot</span>
-          </button>
-          <button class="voice-preset" data-voice="radio">
-            <span class="vp-icon">📻</span><span class="vp-label">Radio</span>
-          </button>
-          <button class="voice-preset" data-voice="underwater">
-            <span class="vp-icon">🌊</span><span class="vp-label">Underwater</span>
-          </button>
-          <button class="voice-preset" data-voice="alien">
-            <span class="vp-icon">👽</span><span class="vp-label">Alien</span>
-          </button>
-          <button class="voice-preset" data-voice="cave">
-            <span class="vp-icon">🦇</span><span class="vp-label">Cave</span>
-          </button>
-        </div>
-        <div class="voice-custom" id="voice-custom-controls" hidden>
-          <label for="vc-ring-freq" class="fx-label">Ring Mod Freq <span id="vc-ring-freq-val">200 Hz</span></label>
-          <input id="vc-ring-freq" type="range" min="20" max="2000" value="200" class="slider slider--eq" />
-          <label for="vc-filter-freq" class="fx-label">Filter Cutoff <span id="vc-filter-freq-val">2000 Hz</span></label>
-          <input id="vc-filter-freq" type="range" min="100" max="8000" value="2000" class="slider slider--eq" />
-        </div>
-      </div>
-    </details>
-
-    <!-- ===== Karaoke Mode ===== -->
-    <details class="panel">
-      <summary class="panel-toggle">🎤 Karaoke Mode</summary>
-      <div class="karaoke-content">
-        <p class="panel-hint">Load a backing track, remove vocals, and sing along with live mic effects!</p>
-
-        <!-- Music file upload -->
-        <div class="karaoke-upload">
-          <label for="karaoke-file" class="btn btn--secondary btn--small">
-            <span class="btn-icon">📂</span> Load Music File
-          </label>
-          <input type="file" id="karaoke-file" accept="audio/*" hidden />
-          <span id="karaoke-filename" class="karaoke-filename">No file loaded</span>
-        </div>
-
-        <!-- Music transport controls -->
-        <div class="karaoke-transport" id="karaoke-transport" hidden>
-          <button id="karaoke-play" class="icon-btn" type="button" title="Play">▶️</button>
-          <button id="karaoke-stop" class="icon-btn" type="button" title="Stop">⏹️</button>
-          <div class="karaoke-progress-wrap">
-            <div class="karaoke-progress-bar">
-              <div id="karaoke-progress" class="karaoke-progress-fill"></div>
-            </div>
-            <span id="karaoke-time" class="karaoke-time">0:00 / 0:00</span>
-          </div>
-        </div>
-
-        <!-- Music volume -->
-        <div class="control-group">
-          <label for="karaoke-volume" class="fx-label">Music Volume <span id="karaoke-vol-val">80%</span></label>
-          <input id="karaoke-volume" type="range" min="0" max="100" value="80" class="slider slider--eq" />
-        </div>
-
-        <!-- Vocal removal toggle -->
-        <div class="fx-card">
-          <div class="fx-header">
-            <span class="fx-name">🚫 Vocal Removal</span>
-            <label class="toggle-switch">
-              <input type="checkbox" id="karaoke-vocal-remove" />
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <p class="fx-hint">Removes center-panned vocals from stereo tracks using phase cancellation.</p>
-        </div>
-
-        <!-- Karaoke mic effects -->
-        <div class="fx-card">
-          <div class="fx-header">
-            <span class="fx-name">🎶 Karaoke Reverb</span>
-            <label class="toggle-switch">
-              <input type="checkbox" id="karaoke-reverb-toggle" checked />
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <div class="fx-controls">
-            <label for="karaoke-reverb-amount" class="fx-label">Amount <span id="karaoke-reverb-val">50%</span></label>
-            <input id="karaoke-reverb-amount" type="range" min="0" max="100" value="50" class="slider slider--eq" />
-          </div>
-        </div>
-      </div>
-    </details>
-
-    <!-- ===== Output Device ===== -->
-    <div id="output-device-section" class="control-group" hidden>
-      <label for="output-select" class="control-label">Output Device</label>
-      <select id="output-select" class="select"></select>
-    </div>
-    <p id="output-note" class="note" hidden>
-      ℹ️ Output device selection is controlled by your OS / browser settings.
-    </p>
-
-    <!-- ===== Record + Timer ===== -->
-    <div class="record-row">
-      <button id="record-btn" class="btn btn--secondary" type="button" disabled>
-        <span class="btn-icon" id="record-icon">⏺️</span>
-        <span id="record-btn-text">Record</span>
-        <kbd class="btn-shortcut">R</kbd>
+      <!-- Mic Button -->
+      <button id="mic-btn" class="btn btn--primary" type="button">
+        <span class="btn-icon" id="mic-btn-icon">🎤</span>
+        <span id="mic-btn-text">Start Microphone</span>
+        <kbd class="btn-shortcut">Space</kbd>
       </button>
-      <span id="record-timer" class="record-timer" hidden>0:00</span>
-    </div>
 
-    <!-- ===== Recordings List ===== -->
-    <div id="recordings-section" class="recordings-section" hidden>
-      <h3 class="section-title">📁 Recordings</h3>
-      <ul id="recordings-list" class="recordings-list"></ul>
-    </div>
+      <!-- Input Device -->
+      <div id="input-device-section" class="control-group">
+        <label for="input-select" class="control-label">Input Device (Microphone)</label>
+        <select id="input-select" class="select">
+          <option value="">Default Microphone</option>
+        </select>
+      </div>
 
-    <!-- ===== Error Box ===== -->
-    <div id="error-box" class="alert alert--error" hidden>
-      <p id="error-text"></p>
-    </div>
+      <!-- Volume + Mute -->
+      <div class="control-group">
+        <label for="gain-slider" class="control-label">
+          Volume <span id="gain-value" class="control-value">100 %</span>
+        </label>
+        <div class="slider-row">
+          <button id="mute-btn" class="icon-btn" type="button" title="Mute (M)">🔊</button>
+          <input id="gain-slider" type="range" min="0" max="200" value="100" step="1" class="slider" />
+        </div>
+      </div>
 
-    <!-- ===== Footer ===== -->
-    <footer class="app-footer">
-      <p>Works best in <strong>Chrome</strong> and <strong>Edge</strong>. Firefox has limited Web Audio support.</p>
-      <p class="credits">College Project &copy; 2026</p>
-    </footer>
+      <!-- 3-Band Equalizer -->
+      <details class="panel">
+        <summary class="panel-toggle">🎛️ Equalizer</summary>
+        <div class="eq-bands">
+          <div class="eq-band">
+            <label for="eq-low">Low</label>
+            <input id="eq-low" type="range" min="-12" max="12" value="0" step="1" class="slider slider--eq" />
+            <span id="eq-low-val" class="eq-val">0 dB</span>
+          </div>
+          <div class="eq-band">
+            <label for="eq-mid">Mid</label>
+            <input id="eq-mid" type="range" min="-12" max="12" value="0" step="1" class="slider slider--eq" />
+            <span id="eq-mid-val" class="eq-val">0 dB</span>
+          </div>
+          <div class="eq-band">
+            <label for="eq-high">High</label>
+            <input id="eq-high" type="range" min="-12" max="12" value="0" step="1" class="slider slider--eq" />
+            <span id="eq-high-val" class="eq-val">0 dB</span>
+          </div>
+          <button id="eq-reset" class="chip chip--small" type="button">Reset EQ</button>
+        </div>
+      </details>
 
-  </main>
+      <!-- Voice Effects -->
+      <details class="panel">
+        <summary class="panel-toggle">✨ Voice Effects</summary>
+        <div class="fx-grid">
+          <div class="fx-card">
+            <div class="fx-header">
+              <span class="fx-name">🏛️ Reverb</span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="fx-reverb-toggle" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="fx-controls">
+              <label for="fx-reverb-mix" class="fx-label">Mix <span id="fx-reverb-mix-val">30%</span></label>
+              <input id="fx-reverb-mix" type="range" min="0" max="100" value="30" class="slider slider--eq" />
+              <label for="fx-reverb-decay" class="fx-label">Decay <span id="fx-reverb-decay-val">2.0s</span></label>
+              <input id="fx-reverb-decay" type="range" min="0.1" max="5" value="2" step="0.1" class="slider slider--eq" />
+            </div>
+          </div>
+          <div class="fx-card">
+            <div class="fx-header">
+              <span class="fx-name">🔁 Delay</span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="fx-delay-toggle" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="fx-controls">
+              <label for="fx-delay-time" class="fx-label">Time <span id="fx-delay-time-val">300ms</span></label>
+              <input id="fx-delay-time" type="range" min="50" max="1000" value="300" step="10" class="slider slider--eq" />
+              <label for="fx-delay-feedback" class="fx-label">Feedback <span id="fx-delay-feedback-val">40%</span></label>
+              <input id="fx-delay-feedback" type="range" min="0" max="90" value="40" class="slider slider--eq" />
+            </div>
+          </div>
+          <div class="fx-card">
+            <div class="fx-header">
+              <span class="fx-name">🔥 Distortion</span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="fx-distort-toggle" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="fx-controls">
+              <label for="fx-distort-amount" class="fx-label">Amount <span id="fx-distort-amount-val">50</span></label>
+              <input id="fx-distort-amount" type="range" min="0" max="100" value="50" class="slider slider--eq" />
+            </div>
+          </div>
+        </div>
+      </details>
 
-  <script src="script.js"></script>
+      <!-- Voice Changer -->
+      <details class="panel">
+        <summary class="panel-toggle">🎭 Voice Changer</summary>
+        <div class="voice-changer-content">
+          <p class="panel-hint">Select a preset to transform your voice in real-time.</p>
+          <div class="voice-presets" id="voice-presets">
+            <button class="voice-preset active" data-voice="normal"><span class="vp-icon">🗣️</span><span class="vp-label">Normal</span></button>
+            <button class="voice-preset" data-voice="deep"><span class="vp-icon">👹</span><span class="vp-label">Deep</span></button>
+            <button class="voice-preset" data-voice="chipmunk"><span class="vp-icon">🐿️</span><span class="vp-label">Chipmunk</span></button>
+            <button class="voice-preset" data-voice="robot"><span class="vp-icon">🤖</span><span class="vp-label">Robot</span></button>
+            <button class="voice-preset" data-voice="radio"><span class="vp-icon">📻</span><span class="vp-label">Radio</span></button>
+            <button class="voice-preset" data-voice="underwater"><span class="vp-icon">🌊</span><span class="vp-label">Underwater</span></button>
+            <button class="voice-preset" data-voice="alien"><span class="vp-icon">👽</span><span class="vp-label">Alien</span></button>
+            <button class="voice-preset" data-voice="cave"><span class="vp-icon">🦇</span><span class="vp-label">Cave</span></button>
+          </div>
+          <div class="voice-custom" id="voice-custom-controls" hidden>
+            <label for="vc-ring-freq" class="fx-label">Ring Mod Freq <span id="vc-ring-freq-val">200 Hz</span></label>
+            <input id="vc-ring-freq" type="range" min="20" max="2000" value="200" class="slider slider--eq" />
+            <label for="vc-filter-freq" class="fx-label">Filter Cutoff <span id="vc-filter-freq-val">2000 Hz</span></label>
+            <input id="vc-filter-freq" type="range" min="100" max="8000" value="2000" class="slider slider--eq" />
+          </div>
+        </div>
+      </details>
+
+      <!-- ===== Karaoke Mode (tabs: File | YouTube) ===== -->
+      <details class="panel" id="karaoke-panel">
+        <summary class="panel-toggle">🎤 Karaoke Mode</summary>
+        <div class="karaoke-content">
+
+          <!-- Tab switcher -->
+          <div class="tab-bar">
+            <button class="tab-btn active" data-tab="file"    id="tab-file-btn">🎵 Music File</button>
+            <button class="tab-btn"        data-tab="youtube" id="tab-yt-btn">▶️ YouTube</button>
+          </div>
+
+          <!-- ── Tab: Local music file ── -->
+          <div class="tab-panel active" id="tab-file">
+            <p class="panel-hint">Load a local audio file, remove vocals, and sing along!</p>
+            <div class="karaoke-upload">
+              <label for="karaoke-file" class="btn btn--secondary btn--small">
+                <span class="btn-icon">📂</span> Load Music File
+              </label>
+              <input type="file" id="karaoke-file" accept="audio/*" hidden />
+              <span id="karaoke-filename" class="karaoke-filename">No file loaded</span>
+            </div>
+            <div class="karaoke-transport" id="karaoke-transport" hidden>
+              <button id="karaoke-play" class="icon-btn" title="Play/Pause">▶️</button>
+              <button id="karaoke-stop" class="icon-btn" title="Stop">⏹️</button>
+              <div class="karaoke-progress-wrap">
+                <div class="karaoke-progress-bar">
+                  <div id="karaoke-progress" class="karaoke-progress-fill"></div>
+                </div>
+                <span id="karaoke-time" class="karaoke-time">0:00 / 0:00</span>
+              </div>
+            </div>
+            <div class="control-group">
+              <label for="karaoke-volume" class="fx-label">Music Volume <span id="karaoke-vol-val">80%</span></label>
+              <input id="karaoke-volume" type="range" min="0" max="100" value="80" class="slider slider--eq" />
+            </div>
+            <div class="fx-card">
+              <div class="fx-header">
+                <span class="fx-name">🚫 Vocal Removal</span>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="karaoke-vocal-remove" />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <p class="fx-hint">Removes center-panned vocals via stereo phase cancellation.</p>
+            </div>
+            <div class="fx-card">
+              <div class="fx-header">
+                <span class="fx-name">🎶 Karaoke Reverb</span>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="karaoke-reverb-toggle" checked />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="fx-controls">
+                <label for="karaoke-reverb-amount" class="fx-label">Amount <span id="karaoke-reverb-val">50%</span></label>
+                <input id="karaoke-reverb-amount" type="range" min="0" max="100" value="50" class="slider slider--eq" />
+              </div>
+            </div>
+          </div><!-- /tab-file -->
+
+          <!-- ── Tab: YouTube ── -->
+          <div class="tab-panel" id="tab-youtube">
+            <p class="panel-hint">Paste a YouTube URL to play a backing track directly in the app.</p>
+
+            <!-- URL input row -->
+            <div class="yt-input-row">
+              <input
+                type="text"
+                id="yt-url-input"
+                class="yt-url-input"
+                placeholder="https://youtu.be/... or youtube.com/watch?v=..."
+                autocomplete="off"
+                spellcheck="false"
+              />
+              <button id="yt-load-btn" class="btn btn--secondary btn--small" type="button">
+                <span class="btn-icon">▶️</span> Load
+              </button>
+            </div>
+
+            <!-- YouTube player embed -->
+            <div id="yt-player-wrapper" class="yt-player-wrapper" hidden>
+              <!-- IFrame API replaces this div -->
+              <div id="yt-player"></div>
+
+              <!-- Custom controls -->
+              <div class="yt-controls" id="yt-controls">
+                <!-- Title -->
+                <div id="yt-title" class="yt-title">—</div>
+
+                <!-- Seek row -->
+                <div class="yt-seek-row">
+                  <span id="yt-current-time" class="yt-time-label">0:00</span>
+                  <input type="range" id="yt-seek" class="slider yt-seek-slider" min="0" max="100" value="0" step="1" />
+                  <span id="yt-duration" class="yt-time-label">0:00</span>
+                </div>
+
+                <!-- Button row -->
+                <div class="yt-btn-row">
+                  <button id="yt-play-pause" class="icon-btn" title="Play / Pause">▶️</button>
+                  <button id="yt-stop"       class="icon-btn" title="Stop">⏹️</button>
+                  <button id="yt-mute-btn"   class="icon-btn" title="Mute">🔊</button>
+                  <input  type="range" id="yt-vol-slider" class="slider yt-vol-slider" min="0" max="100" value="80" />
+                  <button id="yt-fullscreen-btn" class="icon-btn yt-fs-btn" title="Fullscreen player">⛶</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Note about recording -->
+            <p class="note" style="margin-top:0.5rem;">
+              ℹ️ YouTube audio plays through your browser — it cannot be captured in recordings (only mic will be recorded).
+            </p>
+          </div><!-- /tab-youtube -->
+
+        </div><!-- /karaoke-content -->
+      </details><!-- /karaoke panel -->
+
+      <!-- Output Device -->
+      <div id="output-device-section" class="control-group" hidden>
+        <label for="output-select" class="control-label">Output Device</label>
+        <select id="output-select" class="select"></select>
+      </div>
+      <p id="output-note" class="note" hidden>
+        ℹ️ Output routed through OS/browser settings (Bluetooth auto-selected if connected).
+      </p>
+
+      <!-- Record + Timer -->
+      <div class="record-row">
+        <button id="record-btn" class="btn btn--secondary" type="button" disabled>
+          <span class="btn-icon" id="record-icon">⏺️</span>
+          <span id="record-btn-text">Record</span>
+          <kbd class="btn-shortcut">R</kbd>
+        </button>
+        <span id="record-timer" class="record-timer" hidden>0:00</span>
+      </div>
+
+      <!-- Error Box -->
+      <div id="error-box" class="alert alert--error" hidden>
+        <p id="error-text"></p>
+      </div>
+
+    </div><!-- /col--left -->
+
+    <!-- ══════════════════════════════════════
+         RIGHT COLUMN — live view
+         ══════════════════════════════════════ -->
+    <div class="col col--right">
+
+      <!-- Visualizer -->
+      <div class="visualizer-container" id="viz-container">
+        <canvas id="visualizer" class="visualizer-canvas"></canvas>
+        <div class="visualizer-controls">
+          <button id="viz-mode-btn" class="chip" type="button" title="Switch visualizer (V)">
+            <span id="viz-mode-text">Waveform</span>
+          </button>
+          <div class="viz-color-dots">
+            <button class="color-dot color-dot--purple active" data-color="purple"></button>
+            <button class="color-dot color-dot--cyan"          data-color="cyan"></button>
+            <button class="color-dot color-dot--green"         data-color="green"></button>
+            <button class="color-dot color-dot--fire"          data-color="fire"></button>
+          </div>
+          <!-- Fullscreen button inside visualizer -->
+          <button id="viz-fs-btn" class="chip" type="button" title="Fullscreen visualizer (F)">⛶</button>
+        </div>
+      </div>
+
+      <!-- Pitch Detection -->
+      <div id="pitch-display" class="pitch-display" hidden>
+        <span class="pitch-note" id="pitch-note">—</span>
+        <span class="pitch-freq" id="pitch-freq">— Hz</span>
+        <div class="pitch-cents-bar">
+          <div class="pitch-cents-indicator" id="pitch-cents"></div>
+        </div>
+      </div>
+
+      <!-- Level Meter -->
+      <div class="meter-container">
+        <div class="meter-track">
+          <div id="level-bar-l" class="meter-fill"></div>
+        </div>
+        <span id="level-db" class="meter-label">–∞ dB</span>
+      </div>
+
+      <!-- Recordings List (lives in right col on desktop) -->
+      <div id="recordings-section" class="recordings-section" hidden>
+        <h3 class="section-title">📁 Recordings</h3>
+        <ul id="recordings-list" class="recordings-list"></ul>
+      </div>
+
+    </div><!-- /col--right -->
+
+  </div><!-- /layout-grid -->
+
+  <!-- ===== Footer ===== -->
+  <footer class="app-footer">
+    <p>Works best in <strong>Chrome</strong> and <strong>Edge</strong>. Firefox has limited Web Audio support.</p>
+    <p class="credits">College Project &copy; 2026</p>
+  </footer>
+
+</main>
+
+<!-- YouTube IFrame API (loaded lazily via JS when needed) -->
+<script src="script.js"></script>
 </body>
 </html>

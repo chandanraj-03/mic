@@ -2,10 +2,6 @@
 
 A modern, feature-rich, web-based audio application built with plain HTML5, CSS3, and vanilla JavaScript (Web Audio API). It captures live microphone audio, applies real-time DSP effects, offers voice transformation presets, features a full karaoke backing track mode with vocal removal, and routes audio to any selected output device (including Bluetooth speakers).
 
-![License](https://img.shields.io/badge/License-MIT-blue.svg)
-![Tech Stack](https://img.shields.io/badge/Stack-HTML5%20%7C%20CSS3%20%7C%20Vanilla%20JS-brightgreen.svg)
-![Web Audio API](https://img.shields.io/badge/API-Web%20Audio%20API-orange.svg)
-
 ---
 
 ## ✨ Features Breakdown
@@ -23,7 +19,6 @@ A modern, feature-rich, web-based audio application built with plain HTML5, CSS3
   3. **Circular Radial**: 360° frequency-reactive burst visualizer.
   4. **Particle Field**: Amplitude-driven physics particle network.
 - **4 Color Themes**: Purple, Cyan, Green, and Fire glow presets.
-- **Pitch Detector**: Real-time autocorrelation algorithm estimating musical note (e.g., `A4`), frequency (`440 Hz`), and cent tuning deviation (-50 to +50 cents).
 - **RMS Volume Meter**: Live linear level bar with decibel readout (`dB`).
 
 ### 🎛️ Digital Signal Processing (DSP) & Voice Effects
@@ -127,43 +122,3 @@ No node build steps or bundlers are required!
 4. Open `http://localhost:8080` in **Google Chrome** or **Microsoft Edge**.
 
 ---
-
-## 🌐 Deploying to Vercel
-
-Deploy your app live on Vercel in seconds:
-
-### Method 1: Vercel CLI
-```bash
-npx vercel
-```
-Follow the interactive prompts to deploy.
-
-### Method 2: GitHub Integration
-1. Push this folder to a GitHub repository.
-2. Import the repository at [vercel.com/new](https://vercel.com/new).
-3. Click **Deploy**.
-
-> **Note**: Modern browsers require an **HTTPS** connection to grant microphone access (`getUserMedia`). Deploying on Vercel automatically supplies free SSL/HTTPS certificates.
-
----
-
-## 🎓 Viva & Presentation Talking Points
-
-If presenting this project for a college course or viva demo:
-
-1. **Why plain JS over frameworks?**
-   Demonstrates foundational mastery of the DOM API, Canvas API, and Web Audio API without framework overhead or external bundle bloat.
-2. **How does setSinkId work?**
-   Feature detection checks `typeof HTMLMediaElement.prototype.setSinkId === 'function'`. It allows explicit routing of audio nodes/elements to specific hardware output devices.
-3. **How is the Voice Changer built without external libraries?**
-   By combining mathematical DSP techniques: **Ring Modulation** (multiplying an audio signal by a carrier oscillator), **Resonant Filtering** (high-Q BiquadFilters), and **Amplitude Modulation** (LFO gain oscillation for tremolo).
-4. **How does Vocal Removal work?**
-   Stereo phase cancellation. Lead vocals are almost always panned dead-center in studio mixes (equal amplitude & phase in Left and Right channels). By routing `Left + (-Right)`, identical center signals cancel out mathematically (`1 + (-1) = 0`).
-5. **How is memory managed?**
-   Explicit track stopping (`MediaStreamTrack.stop()`), context closure (`AudioContext.close()`), node disconnection, and `requestAnimationFrame` cancellation on cleanup prevent hardware lockups and memory leaks.
-
----
-
-## 📜 License
-
-This project is open-source and available under the [MIT License](LICENSE).
